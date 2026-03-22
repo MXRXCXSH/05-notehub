@@ -4,11 +4,14 @@ import { useDebouncedCallback } from 'use-debounce';
 import css from './App.module.css';
 import 'modern-normalize';
 import NoteList from '../NoteList/NoteList';
-import { fetchNotes } from '../services/noteService';
+import { fetchNotes } from '../../services/noteService';
 import Pagination from '../Pagination/Pagination';
 import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
 import SearchBox from '../SearchBox/SearchBox';
+import Loader from '../Loader/Loader';
+import Error from '../Error/Error';
+import Empty from '../Empty/Emty';
 
 function App() {
   const [page, setPage] = useState(1);
@@ -17,7 +20,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['notes', page, query],
     queryFn: () => fetchNotes({ page, perPage, query }),
     placeholderData: keepPreviousData,
@@ -26,6 +29,7 @@ function App() {
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setQuery(value);
     setPage(1);
+    console.log(value);
   }, 1000);
 
   const handleSearchChange = (value: string) => {
@@ -33,8 +37,11 @@ function App() {
     debouncedSearch(value);
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error...</p>;
+  if (isError) {
+    console.error('Error fetching notes:', error);
+  }
+  if (isLoading) return <Loader />;
+  if (isError) return <Error message="Failed to fetch notes" />;
 
   return (
     <div className={css.app}>
@@ -55,6 +62,7 @@ function App() {
         </button>
       </header>
       {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
+      {data?.notes?.length === 0 && <Empty message="No notes found" />}
       {isOpen && (
         <Modal onClose={() => setIsOpen(false)}>
           <NoteForm onClose={() => setIsOpen(false)} />
