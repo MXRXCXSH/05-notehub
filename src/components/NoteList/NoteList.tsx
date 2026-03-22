@@ -3,11 +3,11 @@ import type { Note } from '../../types/note';
 import { deleteNote } from '../../services/noteService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-interface NotesListProps {
+interface NoteListProps {
   notes: Note[];
 }
 
-function NoteList({ notes }: NotesListProps) {
+function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
   const deleteNoteM = useMutation({

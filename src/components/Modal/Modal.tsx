@@ -18,8 +18,12 @@ function Modal({ children, onClose }: ModalProps) {
       }
     };
     window.addEventListener('keydown', handleKeyDown);
+    document.body.classList.add('no-scroll');
 
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.classList.remove('no-scroll');
+    };
   }, [onClose]);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
